@@ -1,0 +1,82 @@
+
+
+IRQ:
+
+	MOVWF	W_shadow
+	MOVLW	Status
+	MOVWF	B_status
+	MOVLW	Bank
+	MOVWF	B_Shadow
+
+
+	BCF	OE_595
+	BSF	CLK_595
+
+        movf    POSTINC0, w
+        xorwf   LATA, w
+        andlw   ROM_MASK_C
+        xorwf   LATA, f
+        movlw   ROM_MASK_A_write
+
+        movf    POSTINC0, w
+        movwf   LATB
+
+        movf    POSTINC0, w
+        xorwf   LATC, w
+        andlw   ROM_MASK_C
+        xorwf   LATC, f
+        movlw   ROM_MASK_C_write
+	
+	BCF	CLK_595
+	BSF	LOAD_595
+	BCF	LOAD_595
+
+	MOVF	FSR_LOW, w
+	CMP	#42
+	BTFSS	_C
+	BRA	done
+
+	MOVLW	$10
+	MOVWF	FSR0_L
+
+-28cy
+	
+done:
+	RTI 10?
+
+~42 cycles?  50 * 2000 = ~100.00 inst/s -> 400.000 hz
+
+8Mhz / 4 = 2M i/s
+	
+	
+Port_write_E0
+Port_write_set
+        DEBUG_2C        'P', '+'
+        movf    i2c_data1, w
+        movwf   LATA
+        ;xorwf  LATA, w
+        ;andlw  ROM_MASK_A
+        ;xorwf  LATA, f
+
+        movlw   ROM_MASK_A_write
+        movwf   TRISA
+
+        movf    i2c_data2, w
+        xorwf   LATB, w
+        andlw   ROM_MASK_B
+        xorwf   LATB, f
+
+        movlw   ROM_MASK_B_write
+        movwf   TRISB
+
+        movf    i2c_data3, w
+        xorwf   LATC, w
+        andlw   ROM_MASK_C
+        xorwf   LATC, f
+        movlw   ROM_MASK_C_write
+
+        andwf   ROM_MASK_C_and, w       ; pwm in use?
+        movwf   TRISC
+
+
+

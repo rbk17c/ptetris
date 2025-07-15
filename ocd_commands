@@ -1,0 +1,10 @@
+ 1213  vi commands
+ 1214  openocd -c 'adapter driver cmsis-dap ; adapter speed 0' -f target/rp2040.cfg -c "init ; reset ; exit"
+ 1215  openocd -c 'adapter driver cmsis-dap ; adapter speed 8000' -f target/rp2040.cfg -c "init ; reset ; exit"
+ 1216  vi commands 
+ 1217  openocd -c 'adapter driver cmsis-dap ; adapter speed 8000' -f target/rp2040.cfg -c "init ; info ; exit"
+ 1218  openocd -c 'adapter driver cmsis-dap ; adapter speed 8000' -f target/rp2040.cfg -c "init ; info help"
+ 1219  openocd -c 'adapter driver cmsis-dap ; adapter speed 8000' -f target/rp2040.cfg -c "init ; info version"
+ 1220  openocd -c 'adapter driver cmsis-dap ; adapter speed 8000' -f target/rp2040.cfg -c "init ; info version ; exit" 
+ 1221* openocd -c 'adapter driver cmsis-dap ; adapter speed 8000' -f target/rp2040.cfg -c "init ; reset ; exit" 
+ 1222  history | tail > ocd_commands

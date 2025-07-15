@@ -1,0 +1,7 @@
+*.cof
+*.cod
+*.lst
+Appl.inc
+ts.hex
+tags
+

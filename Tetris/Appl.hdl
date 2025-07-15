@@ -1,0 +1,180 @@
+; vim: syntax=pic18 sw=4
+;# hardware version 1.91
+;#
+;#pin	_Mx_10,	A3, Output
+;#pin	_Mx_13,	A5, Output
+;#pin	_Mx_04,	A6, Output
+;#pin	_Mx_06,	A7, Output
+;
+;#pin	_Mx_08,	B0, Output
+;#pin	_Mx_11,	B1, Output
+;#pin	_Mx_09,	B2, Output
+;#pin	_Mx_12,	B3, Output
+;#pin	_Mx_14,	B4, Output
+;#pin	_Mx_15,	B5, Output
+;#
+;#pin	_Mx_01,	C0, Output
+;#pin	_Mx_03,	C1, Output
+;#pin	_Mx_00,	C2, Output
+;#pin	_Mx_07,	C5, Output
+;#pin	_Mx_05,	C6, Output
+;#pin	_Mx_02,	C7, Output
+;#i2c
+;#pin	_RC3,	C3, Input
+;#pin	_RC4,	C4, Input
+;#
+;#pin	_SR_dat,  A0, Output	; grøn
+;#pin	_SR_load, A1, Output	; grøn/hvid
+;#pin	_SR_clk,  A2, Output	; blå
+;#pin	_Sout,	B6, Output
+;#pin	_Sin,	B7, Input
+;#
+;#pic PIC_18_28 Pic18F2320
+;#end
+
+#DEFINE MAT_MASK_A	b'11101000'
+#DEFINE MAT_MASK_B	b'00111111'
+#DEFINE MAT_MASK_C	b'11100111'
+
+; This maps 'the other way' - From a input to 
+;;A's
+;#define _MX_A3	INDF0, 3, i2c_dat1, .10
+;#define _MX_A5	INDF0, 5, i2c_dat1, .13
+;#define _MX_A6	INDF0, 6, i2c_dat1, .4
+;#define _MX_A7	INDF0, 7, i2c_dat1, .6
+;;B's
+;#define _MX_B0	INDF0, 0, i2c_dat1, .8
+;#define _MX_B1	INDF0, 1, i2c_dat1, .11
+;#define _MX_B2	INDF0, 2, i2c_dat1, .9
+;#define _MX_B3	INDF0, 3, i2c_dat1, .12
+;#define _MX_B4	INDF0, 4, i2c_dat1, .14
+;#define _MX_B5	INDF0, 5, i2c_dat1, .15
+;;C's
+;#define _MX_C0	INDF0, 0, i2c_dat1, .1
+;#define _MX_C1	INDF0, 1, i2c_dat1, .3
+;#define _MX_C2	INDF0, 2, i2c_dat1, .0
+;#define _MX_C5	INDF0, 5, i2c_dat1, .7
+;#define _MX_C6	INDF0, 6, i2c_dat1, .5
+;#define _MX_C7	INDF0, 7, i2c_dat1, .2
+;
+;A's
+#define _MX_A3	INDF0, 3, i2c_dat1, ( .15 - .10 )
+#define _MX_A5	INDF0, 5, i2c_dat1, ( .15 - .13 )
+#define _MX_A6	INDF0, 6, i2c_dat1, ( .15 - .4 )
+#define _MX_A7	INDF0, 7, i2c_dat1, ( .15 - .6 )
+;B's
+#define _MX_B0	INDF0, 0, i2c_dat1, ( .15 - .8 )
+#define _MX_B1	INDF0, 1, i2c_dat1, ( .15 - .11 )
+#define _MX_B2	INDF0, 2, i2c_dat1, ( .15 - .9 )
+#define _MX_B3	INDF0, 3, i2c_dat1, ( .15 - .12 )
+#define _MX_B4	INDF0, 4, i2c_dat1, ( .15 - .14 )
+#define _MX_B5	INDF0, 5, i2c_dat1, ( .15 - .15 )
+;C's
+#define _MX_C0	INDF0, 0, i2c_dat1, ( .15 - .1 )
+#define _MX_C1	INDF0, 1, i2c_dat1, ( .15 - .3 )
+#define _MX_C2	INDF0, 2, i2c_dat1, ( .15 - .0 )
+#define _MX_C5	INDF0, 5, i2c_dat1, ( .15 - .7 )
+#define _MX_C6	INDF0, 6, i2c_dat1, ( .15 - .5 )
+#define _MX_C7	INDF0, 7, i2c_dat1, ( .15 - .2 )
+
+MAT_TF macro	o_var, o_bit, i_var, i_bit
+	btfsc	i_var+i_bit/.8, i_bit & .7
+	bsf	o_var, o_bit
+	endm
+
+
+DAT_MAT	macro
+	clrf	INDF0
+	MAT_TF	_MX_A3
+	MAT_TF	_MX_A5
+	MAT_TF	_MX_A6
+	MAT_TF	_MX_A7
+	
+	clrf	PREINC0
+	MAT_TF	_MX_B0
+	MAT_TF	_MX_B1
+	MAT_TF	_MX_B2
+	MAT_TF	_MX_B3
+	MAT_TF	_MX_B4
+	MAT_TF	_MX_B5
+
+	clrf	PREINC0
+	MAT_TF	_MX_C0
+	MAT_TF	_MX_C1
+	MAT_TF	_MX_C2
+	MAT_TF	_MX_C5
+	MAT_TF	_MX_C6
+	MAT_TF	_MX_C7
+
+	endm
+
+
+;  to show:   SR must be:
+;  MA_y  ->SR_dat  SR>bit -> *3 (for FSRpos)
+; line 0 -> 0x02   1 		0x03
+; line 1 -> 0x04   2		0x06
+; line 2 -> 0x10   4		0x0c
+; line 3 -> 0x01   0 		0x00
+; line 4 -> 0x20   5		0x0f
+; line 5 -> 0x80   7		0x15
+; line 6 -> 0x40   6		0x12
+; line 7 -> 0x08   3		0x09
+
+#define MY_LINE DB 0x03, 0x06, 0x0C, 0x00, 0x0F, 0x15, 0x12, 0x09
+
+MZ_LINE macro ; 
+	DB	0x02, 0x04, 0x10, 0x01
+	DB	0x20, 0x80, 0x40, 0x08
+
+
+	endm
+
+
+; SR    bits   	to line
+; 0x01  0000.0000  
+
+
+
+
+
+
+
+;#define _IRQ00	INTCON,  INT0IF
+;#define _IRQ02	INTCON3, INT2IF
+;
+;  - set data pin from W:set_bit
+set_dat macro	set_bit, o_var, o_bit, o_lat ,o_port , o_tris
+	btfss	WREG, set_bit
+	bcf	o_lat, o_bit
+	btfsc	WREG, set_bit
+	bsf	o_lat, o_bit
+	endm
+
+btgl	macro	o_var, o_bit, o_lat ,o_port , o_tris
+	btg	o_lat, o_bit
+	endm
+
+bcfl	macro	o_var, o_bit, o_lat ,o_port , o_tris
+	bcf	o_lat, o_bit
+	endm
+
+bsfl	macro	o_var, o_bit, o_lat ,o_port , o_tris
+	bsf	o_lat, o_bit
+	endm
+
+bcft	macro	o_var, o_bit, o_lat ,o_port , o_tris
+	bcf	o_tris, o_bit
+	endm
+
+bsft	macro	o_var, o_bit, o_lat ,o_port , o_tris
+	bsf	o_tris, o_bit
+	endm
+
+btfssp	macro	o_var, o_bit, o_lat ,o_port , o_tris
+	btfss	o_port, o_bit
+	endm
+
+btfscp	macro	o_var, o_bit, o_lat ,o_port , o_tris
+	btfsc	o_port, o_bit
+	endm
+

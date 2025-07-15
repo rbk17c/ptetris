@@ -1,0 +1,222 @@
+; vim:syntax=pic18
+;
+;		Boot-J for pic18f45j50
+#Define VerStr .22, "ersion gps 1.0,  48Mhz" ; (V from cmd)
+;
+; copyright GPLv2
+;
+; Board pinout: ; 'jtag' pinout:
+;   1 - Vpp		;   1 - NC
+;   2 - Vdd		;   2 - Vdd
+;   3 - Gnd		;   3 - Gnd
+;   4 - PGD		;   4 - PGD
+;   5 - PGC		;   5 - PGC
+;   6 - PGM		;   6 - Mclr
+;
+;			 Hardware for sdcard V0.9 hardware:
+;
+;  pin		connect ;  pin		connect
+;	 1 - RC7/RX	- GPS-tx	;	23 - RA4	- SW2
+;	 2 - RD4	- LedMatrix-y  	;	24 - RA5/p2	- 
+;	 3 - RD5/p22	- LedMatrix-y   ;	25 - RE0	- 
+;	 4 - RD6/p23	- LedMatrix-y  	; 	26 - RE1	- 
+;	 5 - RD7	- LedMatrix-y	;	27 - RE2	-  
+;	 6 - Vss (gnd)	- i3		;	28 - Vdd (gnd)	- i3
+;	 7 - Vdd (5v)	- i2		;	29 - Vss (5v)	- i2
+;	 8 - RB0/p3	- LedMatrix-x	;	30 - OSC1	- Xtal
+;	 9 - RB1/p4	- LedMatrix-x	;	31 - OSC2	- Xtal
+;	10 - RB2/p5	- LedMatrix-x	;	32 - RC0/p11	- xtal 32.7khz
+;	11 - RB3/p6	- LedMatrix-x	;	33 - NC
+;					;
+;	12 - NC				;	34 - NC
+;	13 - NC				;	35 - RC1/p12 	- xtal 32.7khz
+;	14 - RB4/p7     - LedMatrix-x	;	36 - RC2/AN11	- 
+;	15 - RB5/p8	- LedMatrix-x   ;	37 - Vusb (3.3v)- Cap
+;	16 - RB6/p9	- LedMatrix-x   ;	38 - RD0/	- LedMatrix-y
+;	17 - RB7/p10	- LedMatrix-x   ;	39 - RD1/	- LedMatrix-y
+;	18 - MCLR  	- i1		;	40 - RD2/p19	- LedMatrix-y
+;	19 - RA0/p0	- dfc_out	;	41 - RD3/p20	- LedMatrix-y
+;	20 - RA1/p1	- dfc_pow	;	42 - RC4/D+
+;	21 - RA2 	- NC		;	43 - RC5/D-
+;	22 - RA3	- SW1		;	44 - RC6/TX	- GPS-TX
+; 
+;	-----------------------------------------------------------------------
+;
+; Port RA0 - sw1	;1
+; Port RA1 - sw2	;1
+; Port RA2 - nc		;0
+; Port RA3 - nc		;0
+; Port RA4 - nc	       	;0
+; Port RA5 - nc		;0
+; Port RA6 - OSC?	;0
+; Port RA7 - OSC?	;0		
+#define TRIS_FOR_A	b'00000011'
+;
+; Port RB0 - LedMatrix-x ; 0
+; Port RB1 - LedMatrix-x ; 0
+; Port RB2 - LedMatrix-x ; 0
+; Port RB3 - LedMatrix-x ; 0
+; Port RB4 - LedMatrix-x ; 0
+; Port RB5 - LedMatrix-x ; 0
+; Port RB6 - LedMatrix-x ; 0
+; Port RB7 - LedMatrix-x ; 0
+#define TRIS_FOR_B	b'00000000'
+;
+; Port RC0 - nc		;0 xtal 32khz
+; Port RC1 - nc		;0 xtal 32khz
+; Port RC2 - gps-pps	;0
+; Port RC3 - NC  	;0
+; Port RC4 - D+		;0
+; Port RC5 - D-		;0
+; Port RC6 - txgps	;0
+; Port RC7 - rxgps	;0
+#define TRIS_FOR_C	b'10000000'
+;
+; Port RD0 - LedMatrix-y ; 0
+; Port RD1 - LedMatrix-y ; 0
+; Port RD2 - LedMatrix-y ; 0
+; Port RD3 - LedMatrix-x ; 0
+; Port RD4 - LedMatrix-x ; 0
+; Port RD5 - LedMatrix-x ; 0
+; Port RD6 - LedMatrix-x ; 0
+; Port RD7 - LedMatrix-x ; 0
+#define TRIS_FOR_D	b'00000000'
+;
+; Port RE0 - multiled
+; Port RE1 - NC
+; Port RE2 - NC
+; Port RE3 - MCLR
+; Port RE4 - Missing
+; Port RE5 - Missing
+; Port RE6 - Missing
+; Port RE7 - Missing
+#define TRIS_FOR_E	b'00000000'
+;
+; LED:
+;
+#define _LedRed   	LATA, RA2
+#define _LedSYS   	LATA, RA3
+;#define _USB_IoBlink	LATB, RB5
+
+#define _SW1		PORTA, RA0
+#define _SW2		PORTA, RA1
+#define _PPS		PORTC, RC2
+#define _MultiLed	LATE, RE0
+
+#define	SeM_RCSTA	RCSTA
+#define	SeM_TXSTA	TXSTA
+#define	SeM_TXREG	TXREG
+#define	SeM_RCREG	RCREG
+#define	SeM_BAUDCTL	BAUDCON
+#define SeM_SPBRG	SPBRG
+#define	SeM_SPBRGH	SPBRGH
+#define	_SeM_RCIF	PIR1, RCIF
+#define	_SeM_TXIF	PIR1, TXIF
+#define SDC_SSPSTAT	SSP2STAT
+#define SDC_SSPCON1	SSP2CON1
+#define SDC_SSPCON2	SSP2CON2
+#define SDC_SSPBUF	SSP2BUF
+
+#define USB_PIR PIR3, USBIF
+#define USB_PIE PIE3, USBIE
+;====================================================================================================
+;===  boot init code ===
+;====================================================================================================
+freq=.48000000
+FREQ=freq ; freq=.48000000
+	list	p=18F45K50
+
+#include	"p18f45k50.inc"
+
+#ifdef	BootCode
+;
+; Configuration bits
+	CONFIG	PLLSEL	= PLL4x
+	CONFIG	CFGPLLEN= ON
+	CONFIG	CPUDIV = NOCLKDIV	;=48mhz nodivide
+	;CONFIG	CPUDIV = CLKDIV2
+	;CONFIG	CPUDIV = CLKDIV3
+	;CONFIG	CPUDIV = CLKDIV6
+
+	;CONFIG 	FOSC	= HSM
+	CONFIG 	FOSC	= HSH
+	CONFIG	FCMEN	= OFF
+	CONFIG	IESO	= OFF 
+	;CONFIG	PWRTEN	= ON 
+	CONFIG	WDTEN	= OFF
+	CONFIG	MCLRE	= ON
+	CONFIG	STVREN	= OFF
+	CONFIG	ICPRT	= ON		; enable ICRST reset?
+	CONFIG	XINST	= OFF
+
+;    mclre  icprt 		ICRST
+;	off	off		no
+;	on	off		no
+;	off	on		YES
+;	on	on		YES
+
+BootCode=BootCode+1
+USB_VARS=0x400
+DevDB_WriteSz=0x40	; write sizes 
+DevDB_bufSz=0x40	; erase size 
+EEsim_Start=0
+SAVE_USB_VARS=0
+SEM_SPEED=.9600
+SEM_Start=0;0x0890 ; ~050h
+	      ; 76543210
+MON_conf_init=b'01001001'	; write only to usb
+
+#define _Rescue_tris0	TRISB, 0 ; out
+#define _Rescue_tris1	TRISB, 1 ; in
+#define _Rescue_pin0	LATB,  0 ; out
+#define _Rescue_pin1	PORTB, 1 ; in
+
+Private_EEPAGE=(__CODE_END&0xfffC00)-0x0400 ; ( DevDB_bufSz=.1024 )
+
+VBANK0=0x0000
+VBANK4=0x0418; first 0x20 are for BD descriptors
+
+hxv_out_Start=0xD80
+FirmwareCommand='x'
+
+#endif;	BootCode
+; -----------------------------------------------------------------------
+
+
+L_init	MACRO				; local chip init, macro in *.hw
+        ;OSCCON= %01110000 
+		; 76543210
+	;movlw	b'00001000'
+	movlw	b'00001000'
+	movwf	OSCCON
+		; 76543210
+	movlw	b'00010100'
+	movwf	OSCCON2
+
+	BANKSEL	ANSELA
+	clrf	ANSELA, BANKED		; PortA for digital,
+	clrf	ANSELB, BANKED		; PortB for digital,
+	clrf	ANSELC, BANKED		; PortC for digital,
+	clrf	ANSELD, BANKED		; PortD for digital,
+	clrf	ANSELE, BANKED		; PortE for digital,
+
+	clrf	SLRCON, BANKED		; SLEW RATE LIMITED
+	
+	clrf	LATA			; all output low
+	clrf	LATB
+	clrf	LATC
+	clrf	LATD
+	clrf	LATE
+	movlw	TRIS_FOR_A
+	movwf	TRISA
+	movlw	TRIS_FOR_B
+	movwf	TRISB
+	movlw	TRIS_FOR_C
+	movwf	TRISC
+	movlw	TRIS_FOR_D
+	movwf	TRISD
+	movlw	TRIS_FOR_E
+	movwf	TRISE
+
+	ENDM
+

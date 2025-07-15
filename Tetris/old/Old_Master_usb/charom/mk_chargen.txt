@@ -1,0 +1,11 @@
+
+f=/usr/share/vice/C64/chargen
+f=chargen
+o=chargen.asm
+
+
+time xxd -c1 -b chargen  | cut -d' ' -f2 | sed "s/^/	b'/;s/$/',/" > $o
+
+
+#xxd -b $f | xargs -n1 | egrep '^[01]{8}$'  > $o # egrep is slow...½
+
